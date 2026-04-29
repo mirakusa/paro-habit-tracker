@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-29",
+  "updated": "2026-04-30",
   "habits": [
     {
       "name": "食事管理",
@@ -18,17 +18,23 @@
     {
       "name": "ベース練習",
       "icon": "🎸",
-      "data": {}
+      "data": {
+        "2026-04-29": "success"
+      }
     },
     {
       "name": "ボイトレ",
       "icon": "🎤",
-      "data": {}
+      "data": {
+        "2026-04-29": "success"
+      }
     },
     {
       "name": "Coursera",
       "icon": "🎓",
-      "data": {}
+      "data": {
+        "2026-04-29": "success"
+      }
     },
     {
       "name": "E資格",
