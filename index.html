@@ -5,104 +5,393 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paro Habit Tracker</title>
     <style>
+        * { box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background-color: #0d1117;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", Helvetica, Arial, sans-serif;
+            background: radial-gradient(ellipse at top, #161b22 0%, #0d1117 60%);
+            background-attachment: fixed;
             color: #c9d1d9;
             margin: 0;
-            padding: 20px;
+            padding: 24px 16px;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
-        .container { width: 100%; max-width: 500px; }
-        h1 { font-size: 20px; margin-bottom: 20px; color: #ffffff; text-align: center; }
+
+        .container { width: 100%; max-width: 720px; }
+
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h1 {
+            font-size: 22px;
+            margin: 0 0 4px;
+            color: #ffffff;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .header .subtitle {
+            font-size: 12px;
+            color: #6e7681;
+            letter-spacing: 0.5px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: linear-gradient(145deg, #161b22 0%, #1c2129 100%);
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 14px 12px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .summary-card:hover {
+            transform: translateY(-2px);
+            border-color: #484f58;
+        }
+        .summary-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        .summary-value .unit {
+            font-size: 13px;
+            color: #8b949e;
+            font-weight: 500;
+            margin-left: 2px;
+        }
+        .summary-label {
+            font-size: 10px;
+            color: #8b949e;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
         .dashboard-wrapper {
-            display: flex;
             border: 1px solid #30363d;
             border-radius: 12px;
-            padding: 20px;
-            background-color: #161b22;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            padding: 22px 20px;
+            background: linear-gradient(145deg, #161b22 0%, #1a1f27 100%);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
             overflow-x: auto;
         }
-        .labels { display: flex; flex-direction: column; margin-right: 15px; padding-top: 25px; }
-        .label { font-size: 12px; height: 16px; line-height: 16px; color: #8b949e; margin-bottom: 8px; white-space: nowrap; }
-        .grid-container { display: flex; flex-direction: column; }
-        .date-row { display: flex; height: 25px; }
-        .date-label { width: 16px; margin-right: 4px; font-size: 9px; color: #8b949e; text-align: center; }
+        .dashboard {
+            display: flex;
+            min-width: max-content;
+        }
+
+        .labels {
+            display: flex;
+            flex-direction: column;
+            margin-right: 14px;
+            padding-top: 30px;
+            flex-shrink: 0;
+        }
+        .label-item {
+            height: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #c9d1d9;
+            white-space: nowrap;
+        }
+        .label-icon { font-size: 14px; }
+
+        .grid-section { display: flex; flex-direction: column; }
+        .date-row { display: flex; height: 26px; }
+        .date-label {
+            width: 16px;
+            margin-right: 4px;
+            font-size: 9px;
+            color: #6e7681;
+            text-align: center;
+            font-weight: 500;
+        }
+
         .row { display: flex; margin-bottom: 8px; }
-        .day { width: 16px; height: 16px; border-radius: 3px; background-color: #0d1117; margin-right: 4px; position: relative; }
-        .day[data-status="success"] { background-color: #39d353; }
-        .day[data-status="over"] { background-color: #f85149; }
-        .day[data-status="incomplete"] { background-color: #484f58; }
-        
-        .legend { margin-top: 20px; font-size: 11px; color: #8b949e; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; gap: 4px; }
-        .legend-box { width: 12px; height: 12px; border-radius: 2px; }
-        .footer { margin-top: 30px; font-size: 10px; color: #484f58; text-align: center; }
+        .day {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            background-color: #161b22;
+            border: 1px solid #21262d;
+            margin-right: 4px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .day:hover {
+            transform: scale(1.35);
+            z-index: 5;
+            box-shadow: 0 0 0 2px rgba(201, 209, 217, 0.3);
+        }
+        .day[data-status="success"] {
+            background-color: #39d353;
+            border-color: rgba(57, 211, 83, 0.4);
+            box-shadow: 0 0 6px rgba(57, 211, 83, 0.25);
+        }
+        .day[data-status="over"] {
+            background-color: #f85149;
+            border-color: rgba(248, 81, 73, 0.4);
+            box-shadow: 0 0 6px rgba(248, 81, 73, 0.25);
+        }
+        .day[data-status="incomplete"] {
+            background-color: #484f58;
+            border-color: #58616b;
+        }
+        .day.today {
+            outline: 1.5px solid #58a6ff;
+            outline-offset: 1px;
+        }
+
+        .streaks {
+            display: flex;
+            flex-direction: column;
+            margin-left: 14px;
+            padding-top: 30px;
+            flex-shrink: 0;
+        }
+        .streak-item {
+            height: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            color: #8b949e;
+            white-space: nowrap;
+        }
+        .streak-item .flame { margin-right: 3px; }
+        .streak-item .count { color: #f0883e; font-weight: 600; }
+
+        .tooltip {
+            position: fixed;
+            background: #1c2129;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #c9d1d9;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 100;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .tooltip.show { opacity: 1; }
+        .tooltip .tip-date { color: #8b949e; font-size: 10px; margin-bottom: 2px; }
+        .tooltip .tip-status { font-weight: 600; }
+
+        .legend {
+            margin-top: 18px;
+            font-size: 11px;
+            color: #8b949e;
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-box { width: 11px; height: 11px; border-radius: 2px; }
+        .footer {
+            margin-top: 28px;
+            font-size: 10px;
+            color: #484f58;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 480px) {
+            .summary-value { font-size: 18px; }
+            .summary-label { font-size: 9px; }
+            .header h1 { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🦜 Paro Habit Tracker</h1>
-        <div class="dashboard-wrapper">
-            <div class="labels">
-                <div class="label">食事管理</div>
-                <div class="label">筋トレ</div>
-                <div class="label">ベース練習</div>
-                <div class="label">資格勉強</div>
+        <div class="header">
+            <h1>🦜 Paro Habit Tracker</h1>
+            <div class="subtitle">Daily progress &middot; last 21 days</div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-card">
+                <div class="summary-value" id="stat-rate">—<span class="unit">%</span></div>
+                <div class="summary-label">達成率</div>
             </div>
-            <div class="grid-container">
-                <div class="date-row" id="date-row"></div>
-                <div id="rows"></div>
+            <div class="summary-card">
+                <div class="summary-value" id="stat-streak">—<span class="unit">日</span></div>
+                <div class="summary-label">最長ストリーク</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value" id="stat-records">—<span class="unit">件</span></div>
+                <div class="summary-label">記録日数</div>
             </div>
         </div>
+
+        <div class="dashboard-wrapper">
+            <div class="dashboard">
+                <div class="labels" id="labels"></div>
+                <div class="grid-section">
+                    <div class="date-row" id="date-row"></div>
+                    <div id="rows"></div>
+                </div>
+                <div class="streaks" id="streaks"></div>
+            </div>
+        </div>
+
         <div class="legend">
             <div class="legend-item"><div class="legend-box" style="background-color: #39d353;"></div> 達成</div>
             <div class="legend-item"><div class="legend-box" style="background-color: #f85149;"></div> 超過</div>
             <div class="legend-item"><div class="legend-box" style="background-color: #484f58;"></div> 入力中</div>
-            <div class="legend-item"><div class="legend-box" style="background-color: #0d1117;"></div> 未入力</div>
+            <div class="legend-item"><div class="legend-box" style="background-color: #161b22; border: 1px solid #21262d;"></div> 未入力</div>
         </div>
-        <div class="footer">Updated by Paro on 2026-04-29</div>
+
+        <div class="footer" id="footer">Loading…</div>
     </div>
+
+    <div class="tooltip" id="tooltip">
+        <div class="tip-date"></div>
+        <div class="tip-status"></div>
+    </div>
+
     <script>
-        const habits = [
-            { name: "食事管理", data: { "2026-04-29": "over" } },
-            { name: "筋トレ", data: { "2026-04-29": "none" } },
-            { name: "ベース練習", data: { "2026-04-29": "none" } },
-            { name: "資格勉強", data: { "2026-04-29": "success" } }
-        ];
-        const days = 21;
-        const today = new Date("2026-04-29");
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - (days - 1));
+        const STATUS_LABEL = {
+            success: "✅ 達成",
+            over: "⚠️ 超過",
+            incomplete: "✏️ 入力中",
+            none: "— 未入力"
+        };
+        const DAYS = 21;
 
-        const dateRow = document.getElementById('date-row');
-        const rows = document.getElementById('rows');
-
-        for (let i = 0; i < days; i++) {
-            const d = new Date(startDate);
-            d.setDate(startDate.getDate() + i);
-            const label = document.createElement('div');
-            label.className = 'date-label';
-            if (i % 3 === 0 || i === days - 1) label.innerText = `${d.getMonth()+1}/${d.getDate()}`;
-            dateRow.appendChild(label);
+        async function main() {
+            // クエリ付与でCDN/ブラウザのキャッシュ回避
+            const res = await fetch('./data.json?t=' + Date.now());
+            const config = await res.json();
+            render(config);
         }
 
-        habits.forEach(h => {
-            const row = document.createElement('div');
-            row.className = 'row';
-            for (let i = 0; i < days; i++) {
+        function render(config) {
+            const habits = config.habits;
+            const todayStr = config.updated;
+            const today = new Date(todayStr);
+            const startDate = new Date(today);
+            startDate.setDate(today.getDate() - (DAYS - 1));
+
+            const labelsEl = document.getElementById('labels');
+            const dateRow = document.getElementById('date-row');
+            const rowsEl = document.getElementById('rows');
+            const streaksEl = document.getElementById('streaks');
+
+            habits.forEach(h => {
+                const item = document.createElement('div');
+                item.className = 'label-item';
+                item.innerHTML = `<span class="label-icon">${h.icon}</span><span>${h.name}</span>`;
+                labelsEl.appendChild(item);
+            });
+
+            for (let i = 0; i < DAYS; i++) {
                 const d = new Date(startDate);
                 d.setDate(startDate.getDate() + i);
-                const ds = d.toISOString().split('T')[0];
-                const day = document.createElement('div');
-                day.className = 'day';
-                if (h.data[ds] && h.data[ds] !== "none") day.setAttribute('data-status', h.data[ds]);
-                row.appendChild(day);
+                const lbl = document.createElement('div');
+                lbl.className = 'date-label';
+                if (i % 3 === 0 || i === DAYS - 1) lbl.innerText = `${d.getMonth()+1}/${d.getDate()}`;
+                dateRow.appendChild(lbl);
             }
-            rows.appendChild(row);
-        });
+
+            let totalSlots = 0;
+            let totalSuccess = 0;
+            let totalRecorded = 0;
+            let globalMaxStreak = 0;
+
+            habits.forEach(h => {
+                const row = document.createElement('div');
+                row.className = 'row';
+
+                let currentStreak = 0;
+                const sortedKeys = Object.keys(h.data).sort().reverse();
+                for (let i = 0; i < sortedKeys.length; i++) {
+                    if (h.data[sortedKeys[i]] === "success") currentStreak++;
+                    else break;
+                }
+
+                let runStreak = 0;
+                let maxStreak = 0;
+                for (let i = 0; i < DAYS; i++) {
+                    const d = new Date(startDate);
+                    d.setDate(startDate.getDate() + i);
+                    const ds = d.toISOString().split('T')[0];
+                    const status = h.data[ds] || "none";
+
+                    const cell = document.createElement('div');
+                    cell.className = 'day';
+                    if (ds === todayStr) cell.classList.add('today');
+                    if (status !== "none") cell.setAttribute('data-status', status);
+                    cell.dataset.date = ds;
+                    cell.dataset.status = status;
+                    row.appendChild(cell);
+
+                    totalSlots++;
+                    if (status === "success") {
+                        totalSuccess++;
+                        totalRecorded++;
+                        runStreak++;
+                        if (runStreak > maxStreak) maxStreak = runStreak;
+                    } else {
+                        if (status !== "none") totalRecorded++;
+                        runStreak = 0;
+                    }
+                }
+                if (maxStreak > globalMaxStreak) globalMaxStreak = maxStreak;
+                rowsEl.appendChild(row);
+
+                const streakItem = document.createElement('div');
+                streakItem.className = 'streak-item';
+                streakItem.innerHTML = `<span class="flame">🔥</span><span class="count">${currentStreak}</span>`;
+                streaksEl.appendChild(streakItem);
+            });
+
+            const rate = totalSlots > 0 ? Math.round((totalSuccess / totalSlots) * 100) : 0;
+            document.getElementById('stat-rate').innerHTML = `${rate}<span class="unit">%</span>`;
+            document.getElementById('stat-streak').innerHTML = `${globalMaxStreak}<span class="unit">日</span>`;
+            document.getElementById('stat-records').innerHTML = `${totalRecorded}<span class="unit">件</span>`;
+
+            document.getElementById('footer').textContent = `Updated by Paro on ${todayStr}`;
+
+            attachTooltip();
+        }
+
+        function attachTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            const tipDate = tooltip.querySelector('.tip-date');
+            const tipStatus = tooltip.querySelector('.tip-status');
+
+            document.querySelectorAll('.day').forEach(cell => {
+                cell.addEventListener('mouseenter', () => {
+                    tipDate.textContent = cell.dataset.date;
+                    tipStatus.textContent = STATUS_LABEL[cell.dataset.status];
+                    tooltip.classList.add('show');
+                });
+                cell.addEventListener('mousemove', e => {
+                    tooltip.style.left = (e.clientX + 12) + 'px';
+                    tooltip.style.top = (e.clientY + 12) + 'px';
+                });
+                cell.addEventListener('mouseleave', () => {
+                    tooltip.classList.remove('show');
+                });
+            });
+        }
+
+        main();
     </script>
 </body>
 </html>
