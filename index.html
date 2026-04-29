@@ -138,15 +138,6 @@
             border-color: rgba(57, 211, 83, 0.4);
             box-shadow: 0 0 6px rgba(57, 211, 83, 0.25);
         }
-        .day[data-status="over"] {
-            background-color: #f85149;
-            border-color: rgba(248, 81, 73, 0.4);
-            box-shadow: 0 0 6px rgba(248, 81, 73, 0.25);
-        }
-        .day[data-status="incomplete"] {
-            background-color: #484f58;
-            border-color: #58616b;
-        }
         .day.today {
             outline: 1.5px solid #58a6ff;
             outline-offset: 1px;
@@ -251,8 +242,6 @@
 
         <div class="legend">
             <div class="legend-item"><div class="legend-box" style="background-color: #39d353;"></div> 達成</div>
-            <div class="legend-item"><div class="legend-box" style="background-color: #f85149;"></div> 超過</div>
-            <div class="legend-item"><div class="legend-box" style="background-color: #484f58;"></div> 入力中</div>
             <div class="legend-item"><div class="legend-box" style="background-color: #161b22; border: 1px solid #21262d;"></div> 未入力</div>
         </div>
 
@@ -267,14 +256,11 @@
     <script>
         const STATUS_LABEL = {
             success: "✅ 達成",
-            over: "⚠️ 超過",
-            incomplete: "✏️ 入力中",
             none: "— 未入力"
         };
         const DAYS = 21;
 
         async function main() {
-            // クエリ付与でCDN/ブラウザのキャッシュ回避
             const res = await fetch('./data.json?t=' + Date.now());
             const config = await res.json();
             render(config);
@@ -310,7 +296,6 @@
 
             let totalSlots = 0;
             let totalSuccess = 0;
-            let totalRecorded = 0;
             let globalMaxStreak = 0;
 
             habits.forEach(h => {
@@ -335,7 +320,7 @@
                     const cell = document.createElement('div');
                     cell.className = 'day';
                     if (ds === todayStr) cell.classList.add('today');
-                    if (status !== "none") cell.setAttribute('data-status', status);
+                    if (status === "success") cell.setAttribute('data-status', status);
                     cell.dataset.date = ds;
                     cell.dataset.status = status;
                     row.appendChild(cell);
@@ -343,11 +328,9 @@
                     totalSlots++;
                     if (status === "success") {
                         totalSuccess++;
-                        totalRecorded++;
                         runStreak++;
                         if (runStreak > maxStreak) maxStreak = runStreak;
                     } else {
-                        if (status !== "none") totalRecorded++;
                         runStreak = 0;
                     }
                 }
@@ -363,7 +346,7 @@
             const rate = totalSlots > 0 ? Math.round((totalSuccess / totalSlots) * 100) : 0;
             document.getElementById('stat-rate').innerHTML = `${rate}<span class="unit">%</span>`;
             document.getElementById('stat-streak').innerHTML = `${globalMaxStreak}<span class="unit">日</span>`;
-            document.getElementById('stat-records').innerHTML = `${totalRecorded}<span class="unit">件</span>`;
+            document.getElementById('stat-records').innerHTML = `${totalSuccess}<span class="unit">件</span>`;
 
             document.getElementById('footer').textContent = `Updated by Paro on ${todayStr}`;
 

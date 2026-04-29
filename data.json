@@ -5,26 +5,32 @@
       "name": "食事管理",
       "icon": "🍽️",
       "data": {
-        "2026-04-29": "over"
+        "2026-04-29": "success"
       }
     },
     {
       "name": "筋トレ",
       "icon": "💪",
-      "data": {
-        "2026-04-29": "none"
-      }
+      "data": {}
     },
     {
       "name": "ベース練習",
       "icon": "🎸",
-      "data": {
-        "2026-04-29": "none"
-      }
+      "data": {}
     },
     {
-      "name": "資格勉強",
-      "icon": "📚",
+      "name": "ボイトレ",
+      "icon": "🎤",
+      "data": {}
+    },
+    {
+      "name": "Coursera",
+      "icon": "🎓",
+      "data": {}
+    },
+    {
+      "name": "E資格",
+      "icon": "🤖",
       "data": {
         "2026-04-29": "success"
       }
