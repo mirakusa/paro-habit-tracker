@@ -350,6 +350,10 @@
 
             document.getElementById('footer').textContent = `Updated by Paro on ${todayStr}`;
 
+            // 読み込み時に右端（最新）までスクロール
+            const wrapper = document.querySelector('.dashboard-wrapper');
+            wrapper.scrollLeft = wrapper.scrollWidth;
+
             attachTooltip();
         }
 
