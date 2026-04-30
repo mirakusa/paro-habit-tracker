@@ -5,7 +5,8 @@
       "name": "食事管理",
       "icon": "🍽️",
       "data": {
-        "2026-04-29": "success"
+        "2026-04-29": "success",
+        "2026-04-30": "success"
       }
     },
     {
@@ -33,7 +34,8 @@
       "name": "Coursera",
       "icon": "🎓",
       "data": {
-        "2026-04-29": "success"
+        "2026-04-29": "success",
+        "2026-04-30": "success"
       }
     },
     {
