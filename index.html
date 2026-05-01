@@ -303,6 +303,7 @@
             let totalSuccess = 0;
             let globalMaxStreak = 0;
 
+            const uniqueSuccessDays = new Set();
             habits.forEach(h => {
                 const row = document.createElement('div');
                 row.className = 'row';
@@ -334,6 +335,7 @@
                     if (status === "success") {
                         totalSuccess++;
                         runStreak++;
+                        uniqueSuccessDays.add(ds);
                         if (runStreak > maxStreak) maxStreak = runStreak;
                     } else {
                         runStreak = 0;
@@ -351,7 +353,7 @@
             const rate = totalSlots > 0 ? Math.round((totalSuccess / totalSlots) * 100) : 0;
             document.getElementById('stat-rate').innerHTML = `${rate}<span class="unit">%</span>`;
             document.getElementById('stat-streak').innerHTML = `${globalMaxStreak}<span class="unit">日</span>`;
-            document.getElementById('stat-records').innerHTML = `${totalSuccess}<span class="unit">件</span>`;
+            document.getElementById('stat-records').innerHTML = `${uniqueSuccessDays.size}<span class="unit">日</span>`;
 
             document.getElementById('footer').textContent = `Updated by Paro on ${todayStr}`;
 
